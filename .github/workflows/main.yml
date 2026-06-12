@@ -1,6 +1,8 @@
 name: Vertos Auto Register
 
 on:
+  schedule:
+    - cron: "*/8 * * * *"  # 每 8 分钟执行一次
   workflow_dispatch:
     inputs:
       count:
