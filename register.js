@@ -28,12 +28,34 @@ function randomEmail() {
 
 // 生成随机用户名
 function randomUsername() {
-  const adjectives = ['Swift', 'Happy', 'Bright', 'Cool', 'Fast', 'Smart', 'Bold', 'Quick'];
-  const nouns = ['Tiger', 'Fox', 'Bear', 'Hawk', 'Lion', 'Wolf', 'Eagle', 'Cat'];
-  const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
-  const noun = nouns[Math.floor(Math.random() * nouns.length)];
-  const num = Math.floor(Math.random() * 9000) + 1000;
-  return `${adj}${noun}${num}`;
+    const firstNames = [
+        'alex', 'jack', 'ethan', 'ryan', 'lucas',
+        'logan', 'jason', 'leo', 'mason', 'dylan',
+        'emma', 'mia', 'lily', 'sophia', 'ava',
+        'olivia', 'grace', 'chloe','tice','kya','gar','dtual','niz','cwo','mo','tion','sti','dtu','nica','lya','try','men','de','gem'
+    ];
+
+    const lastNames = [
+        'smith', 'johnson', 'brown', 'wilson',
+        'miller', 'moore', 'lee', 'taylor',
+        'anderson', 'clark', 'white', 'hall',
+        'young', 'king', 'wright','nic','gooa','ska','dry','ma','kaw','sta','stmil','pol','duo','ley','duy','by','ly','sy'
+    ];
+
+    const patterns = [
+        (f, l) => `${f}${l}`,
+        (f, l) => `${f}_${l}`,
+        (f, l) => `${f}.${l}`,
+        (f, l) => `${f}${l.slice(0, 3)}`,
+        (f, l) => `${f.slice(0, 1)}${l}`,
+        (f, l) => `${f}${l.slice(0, 1)}`
+    ];
+
+    const first = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const last = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+
+    return pattern(first, last);
 }
 
 // 生成强密码
