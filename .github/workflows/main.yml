@@ -6,7 +6,7 @@ on:
       count:
         description: '注册账号数量'
         required: true
-        default: '10'
+        default: '1'
       ref_code:
         description: '推荐码'
         required: false
