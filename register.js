@@ -32,14 +32,14 @@ function randomUsername() {
         'alex', 'jack', 'ethan', 'ryan', 'lucas',
         'logan', 'jason', 'leo', 'mason', 'dylan',
         'emma', 'mia', 'lily', 'sophia', 'ava',
-        'olivia', 'grace', 'chloe','tice','kya','gar','dtual','niz','cwo','mo','tion','sti','dtu','nica','lya','try','men','de','gem'
+        'olivia', 'grace', 'chloe','tice','kya','gar','dtual','niz','cwo','mo','tion','sti','dtu','nica','lya','try','men','de','gem', 'pre', 'str', 'ment', 'un', 'ble', 'inter', 'co', 'dis', 'sion', 'sta', 'ness', 'pro', 'tur', 'ex', 'con', 'able', 'sti', 'tion', 'sub', 'ment', 'over', 'tri', 'ence', 'mis', 'sion', 'trans', 'pre', 'ance', 'gra', 'under', 'inter', 'tion', 'extra', 'sta', 'sti', 'con', 'dis', 'sub', 'mis', 'tri', 'str', 'ment', 'tion', 'sion', 'ness', 'able', 'ture', 'ence', 'ance', 'over', 'under', 'inter', 'trans', 'extra', 'ation', 'sible', 'tious', 'cious', 'phous', 'tment', 'sta', 'sti', 'pre', 'pro', 'con', 'dis', 'sub', 'mis', 'tri', 'str', 'ment', 'tion', 'sion', 'ness', 'able', 'ture', 'ence', 'ance', 'over', 'under', 'inter', 'trans', 'extra', 'ation', 'sible', 'tious', 'cious', 'phous', 'tment', 'sta', 'sti', 'pre', 'pro', 'con', 'dis', 'sub', 'mis'
     ];
 
     const lastNames = [
         'smith', 'johnson', 'brown', 'wilson',
         'miller', 'moore', 'lee', 'taylor',
         'anderson', 'clark', 'white', 'hall',
-        'young', 'king', 'wright','nic','gooa','ska','dry','ma','kaw','sta','stmil','pol','duo','ley','duy','by','ly','sy'
+        'young', 'king', 'wright','nic','gooa','ska','dry','ma','kaw','sta','stmil','pol','duo','ley','duy','by','ly','sy', 'zi', 'sta', 'sti', 'pre', 'pro', 'con', 'dis', 'sub', 'mis', 'tri', 'str', 'men', 'tio', 'sio', 'nes', 'abl', 'tur', 'enc', 'anc', 'ove', 'und', 'int', 'tra', 'ext', 'ati', 'sib', 'tio', 'cio', 'pho', 'tme', 'gra', 'ple', 'ble', 'cle', 'dle', 'fle', 'gle', 'kle', 'ple', 'tle', 'bre', 'cre', 'dre', 'fre', 'gre', 'kre', 'pre', 'tre', 'bre', 'cre', 'dre', 'fre', 'gre', 'pre', 'tre', 'ble', 'cle', 'dle', 'fle', 'gle', 'ple', 'tle', 'bre', 'cre', 'dre', 'fre', 'gre', 'pre', 'tre', 'ment', 'tion', 'sion', 'ness', 'able', 'ture', 'ence', 'ance', 'over', 'under', 'inter', 'trans', 'extra', 'ation', 'sible', 'tious', 'cious', 'phous', 'tment', 'graph', 'phone', 'scope', 'tract', 'press', 'gress', 'gress', 'spect', 'dict', 'duct', 'ject', 'port', 'struct', 'tend', 'vent', 'vert', 'view', 'vis', 'aud', 'cred', 'fid', 'form', 'ject', 'lect', 'mit', 'pend', 'rupt', 'scrib', 'sequ', 'sign', 'tend', 'tract', 'vent', 'vert', 'vis'
     ];
 
     const patterns = [
