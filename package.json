@@ -1,0 +1,21 @@
+{
+  "name": "vertos-auto-register",
+  "version": "1.0.0",
+  "description": "Vertos Dashboard 自动注册脚本",
+  "main": "register.js",
+  "scripts": {
+    "start": "node register.js",
+    "test": "node register.js 1"
+  },
+  "keywords": [
+    "playwright",
+    "automation",
+    "registration",
+    "vertos"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "playwright": "^1.60.0"
+  }
+}
