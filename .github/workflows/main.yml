@@ -6,7 +6,7 @@ on:
       count:
         description: '注册账号数量'
         required: true
-        default: '1'
+        default: '10'
       ref_code:
         description: '推荐码'
         required: false
@@ -15,7 +15,7 @@ on:
 jobs:
   register:
     runs-on: ubuntu-22.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     
     steps:
       - name: 检出代码
@@ -26,58 +26,119 @@ jobs:
         with:
           node-version: '20'
 
-      # ========================================
-      # 🟡 1️⃣ 启用 WARP（更换 IP）
-      # ========================================
-      - name: 启用 WARP 网络
-        uses: fscarmen/warp-on-actions@v1.3
-        with:
-          stack: dual
-          mode: client
-
-      - name: 检查 IP 地址
-        run: |
-          echo "🌍 当前 IP 地址:"
-          curl -s https://api.ipify.org
-          echo
-          echo "📍 IP 详细信息:"
-          curl -s https://ipinfo.io
-
-      # ========================================
-      # 🟡 2️⃣ 安装 Playwright
-      # ========================================
       - name: 安装依赖
         run: |
           npm install playwright
           npx playwright install chromium
 
       # ========================================
-      # 🟡 3️⃣ 执行注册脚本
+      # 🟡 批量注册 - 每次注册前刷新 WARP
       # ========================================
-      - name: 执行自动注册
+      - name: 执行批量注册（每次刷新IP）
         env:
           REGISTER_COUNT: ${{ github.event.inputs.count || '10' }}
         run: |
-          mkdir -p screenshots
-          node register.js $REGISTER_COUNT
-
-      # ========================================
-      # 🟡 4️⃣ 显示结果
-      # ========================================
-      - name: 显示注册结果
-        if: always()
-        run: |
-          if [ -f registration_results.json ]; then
-            echo "📊 注册结果:"
-            echo
-            cat registration_results.json | jq -r '.[] | 
-              "邮箱: \(.email) | 用户名: \(.username) | 状态: \(.status)"'
+          COUNT=${REGISTER_COUNT}
+          echo "======================================================================"
+          echo "Vertos Dashboard 批量注册（每次刷新IP）"
+          echo "======================================================================"
+          echo "目标数量: ${COUNT}"
+          echo "推荐码: ${{ github.event.inputs.ref_code || 'DzE8Hs1b' }}"
+          echo "======================================================================"
+          echo ""
+          
+          # 创建结果数组
+          declare -a RESULTS
+          
+          for i in $(seq 1 $COUNT); do
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "[$i/$COUNT] 第 ${i} 次注册"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             
-            echo
-            echo "📈 统计:"
+            # 启用 WARP（每次注册都重新启用，获取新IP）
+            echo "🔄 正在启用 WARP 获取新 IP..."
+            curl -fsSL https://github.com/P3TERX/warp.sh/raw/main/warp.sh | sudo bash -s -- --ipv4
+            
+            # 等待 WARP 连接稳定
+            sleep 3
+            
+            # 检查新 IP
+            echo "🌐 当前 IP:"
+            NEW_IP=$(curl -s https://api.ipify.org)
+            echo "   ${NEW_IP}"
+            echo ""
+            
+            # 执行注册
+            echo "🚀 开始注册..."
+            node register.js 1
+            
+            # 显示结果
+            if [ -f registration_results.json ]; then
+              LAST_RESULT=$(cat registration_results.json | jq -r '.[-1]')
+              EMAIL=$(echo $LAST_RESULT | jq -r '.email')
+              USERNAME=$(echo $LAST_RESULT | jq -r '.username')
+              PASSWORD=$(echo $LAST_RESULT | jq -r '.password')
+              STATUS=$(echo $LAST_RESULT | jq -r '.status')
+              
+              echo ""
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              if [ "$STATUS" = "success" ]; then
+                echo "✅ 注册成功！"
+              else
+                echo "⚠️  注册完成（请检查状态）"
+              fi
+              echo ""
+              echo "📧 邮箱: ${EMAIL}"
+              echo "👤 用户名: ${USERNAME}"
+              echo "🔑 密码: ${PASSWORD}"
+              echo "🌐 IP: ${NEW_IP}"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              
+              RESULTS+=("[$i] ${EMAIL} | ${USERNAME} | ${STATUS} | IP: ${NEW_IP}")
+            fi
+            
+            echo ""
+            
+            # 如果不是最后一次，等待一段时间
+            if [ $i -lt $COUNT ]; then
+              DELAY=$((RANDOM % 3 + 2))
+              echo "⏳ 等待 ${DELAY} 秒后继续下一个..."
+              sleep ${DELAY}
+              echo ""
+            fi
+          done
+          
+          # 显示最终统计
+          echo ""
+          echo "======================================================================"
+          echo "📊 注册完成汇总"
+          echo "======================================================================"
+          
+          if [ -f registration_results.json ]; then
             TOTAL=$(cat registration_results.json | jq 'length')
             SUCCESS=$(cat registration_results.json | jq '[.[] | select(.status == "success")] | length')
+            FAILED=$(cat registration_results.json | jq '[.[] | select(.status != "success")] | length')
             
-            echo "  ✅ 成功: $SUCCESS"
-            echo "  📊 总计: $TOTAL"
+            echo "✅ 成功: ${SUCCESS}"
+            echo "❌ 失败: ${FAILED}"
+            echo "📊 总计: ${TOTAL}"
+            echo "======================================================================"
+            echo ""
+            
+            echo "📋 所有注册账号:"
+            echo "----------------------------------------------------------------------"
+            cat registration_results.json | jq -r '.[] | 
+              "邮箱: \(.email) | 用户名: \(.username) | 密码: \(.password)"'
+            echo "----------------------------------------------------------------------"
           fi
+
+      # ========================================
+      # 🟡 保存结果到 Artifacts（可选）
+      # ========================================
+      - name: 上传注册结果
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: registration-results-${{ github.run_number }}
+          path: registration_results.json
+          retention-days: 1
