@@ -47,24 +47,44 @@ jobs:
           echo "======================================================================"
           echo ""
           
-          # 创建结果数组
-          declare -a RESULTS
-          
           for i in $(seq 1 $COUNT); do
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo "[$i/$COUNT] 第 ${i} 次注册"
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             
-            # 启用 WARP（每次注册都重新启用，获取新IP）
-            echo "🔄 正在启用 WARP 获取新 IP..."
-            curl -fsSL https://github.com/P3TERX/warp.sh/raw/main/warp.sh | sudo bash -s -- --ipv4
+            # 如果不是第一次，重启 WARP 获取新 IP
+            if [ $i -gt 1 ]; then
+              echo "🔄 正在重启 WARP 获取新 IP..."
+              
+              # 方法1: 重启 WARP 客户端
+              warp-cli disconnect 2>/dev/null || true
+              sleep 2
+              warp-cli connect 2>/dev/null || true
+              sleep 3
+              
+              # 方法2: 如果方法1失败，尝试重新安装 WireGuard
+              if ! curl -s --max-time 5 https://cloudflare.com/cdn-cgi/trace | grep -q "warp=on"; then
+                echo "   重启失败，尝试重新配置 WireGuard..."
+                curl -fsSL https://github.com/P3TERX/warp.sh/raw/main/warp.sh | sudo bash -s -- wg4
+                sleep 5
+              fi
+            else
+              echo "🔄 首次运行，正在启用 WARP..."
+              curl -fsSL https://github.com/P3TERX/warp.sh/raw/main/warp.sh | sudo bash -s -- wg4
+              sleep 5
+            fi
             
-            # 等待 WARP 连接稳定
-            sleep 3
+            # 检查 WARP 状态
+            echo "🔍 检查 WARP 状态..."
+            if curl -s --max-time 10 https://cloudflare.com/cdn-cgi/trace | grep -q "warp=on"; then
+              echo "   ✅ WARP 已启用"
+            else
+              echo "   ⚠️  WARP 未启用，继续使用当前网络"
+            fi
             
-            # 检查新 IP
+            # 获取当前 IP
             echo "🌐 当前 IP:"
-            NEW_IP=$(curl -s https://api.ipify.org)
+            NEW_IP=$(curl -s --max-time 10 https://api.ipify.org || echo "Unknown")
             echo "   ${NEW_IP}"
             echo ""
             
@@ -93,8 +113,6 @@ jobs:
               echo "🔑 密码: ${PASSWORD}"
               echo "🌐 IP: ${NEW_IP}"
               echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-              
-              RESULTS+=("[$i] ${EMAIL} | ${USERNAME} | ${STATUS} | IP: ${NEW_IP}")
             fi
             
             echo ""
