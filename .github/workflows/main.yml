@@ -1,0 +1,103 @@
+name: Vertos Auto Register
+
+on:
+  workflow_dispatch:
+    inputs:
+      count:
+        description: '注册账号数量'
+        required: true
+        default: '1'
+      ref_code:
+        description: '推荐码'
+        required: false
+        default: 'DzE8Hs1b'
+
+jobs:
+  register:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # ========================================
+      # 🟡 1️⃣ 启用 WARP（更换 IP）
+      # ========================================
+      - name: 启用 WARP 网络
+        uses: fscarmen/warp-on-actions@v1.3
+        with:
+          stack: dual
+          mode: client
+
+      - name: 检查 IP 地址
+        run: |
+          echo "🌍 当前 IP 地址:"
+          curl -s https://api.ipify.org
+          echo
+          echo "📍 IP 详细信息:"
+          curl -s https://ipinfo.io
+
+      # ========================================
+      # 🟡 2️⃣ 安装 Playwright
+      # ========================================
+      - name: 安装依赖
+        run: |
+          npm init -y
+          npm install playwright
+          npx playwright install chromium
+
+      # ========================================
+      # 🟡 3️⃣ 执行注册脚本
+      # ========================================
+      - name: 执行自动注册
+        env:
+          REGISTER_COUNT: ${{ github.event.inputs.count || '10' }}
+        run: |
+          mkdir -p screenshots
+          node register.js $REGISTER_COUNT
+
+      # ========================================
+      # 🟡 4️⃣ 上传结果
+      # ========================================
+      - name: 上传截图
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: screenshots/
+          retention-days: 7
+
+      - name: 上传注册结果
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: registration-results
+          path: registration_results.json
+          retention-days: 30
+
+      # ========================================
+      # 🟡 5️⃣ 显示结果
+      # ========================================
+      - name: 显示注册结果
+        if: always()
+        run: |
+          if [ -f registration_results.json ]; then
+            echo "📊 注册结果:"
+            echo
+            cat registration_results.json | jq -r '.[] | 
+              "邮箱: \(.email) | 用户名: \(.username) | 状态: \(.status)"'
+            
+            echo
+            echo "📈 统计:"
+            TOTAL=$(cat registration_results.json | jq 'length')
+            SUCCESS=$(cat registration_results.json | jq '[.[] | select(.status == "success")] | length')
+            
+            echo "  ✅ 成功: $SUCCESS"
+            echo "  📊 总计: $TOTAL"
+          fi
