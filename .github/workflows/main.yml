@@ -10,7 +10,7 @@ on:
       ref_code:
         description: '推荐码'
         required: false
-        default: 'DzE8Hs1b'
+        default: '5AeDoVSK'
 
 jobs:
   register:
