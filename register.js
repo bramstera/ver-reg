@@ -9,7 +9,7 @@ const fs = require('fs');
 // 配置
 const CONFIG = {
   baseUrl: 'https://dash.vertos.in/register',
-  refCode: 'DzE8Hs1b',
+  refCode: '5AeDoVSK',
   headless: true,
   screenshotsDir: 'screenshots',
   timeout: 60000
